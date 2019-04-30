@@ -6,9 +6,13 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class NewWordActivity : AppCompatActivity() {
+    companion object {
+        const val EXTRA_REPLY = "com.blagovestpetkov.roomdatabasesample.REPLAY"
+    }
 
     private lateinit var editWordView: EditText
 
@@ -20,20 +24,15 @@ class NewWordActivity : AppCompatActivity() {
     }
 
     fun saveWord(view: View) {
-
-        val replyIntent:Intent  =  Intent();
+        val replyIntent: Intent = Intent();
         if (TextUtils.isEmpty(editWordView.getText())) {
             setResult(RESULT_CANCELED, replyIntent);
 
         } else {
-            val word: String  = editWordView.getText().toString();
+            val word: String = editWordView.getText().toString();
             replyIntent.putExtra(EXTRA_REPLY, word);
             setResult(RESULT_OK, replyIntent);
         }
         finish();
-    }
-
-    companion object {
-        const val EXTRA_REPLY = "com.blagovestpetkov.roomdatabasesample.REPLAY"
     }
 }
