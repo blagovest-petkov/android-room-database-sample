@@ -27,6 +27,10 @@ class WordListAdapter(context: Context) : RecyclerView.Adapter<WordListAdapter.W
         notifyDataSetChanged()
     }
 
+    fun getWordAtPosition(position: Int): Word {
+        return words.get(position)
+    }
+
     class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val wordItemView: TextView = itemView.findViewById(R.id.textView)
     }

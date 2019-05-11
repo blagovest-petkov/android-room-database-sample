@@ -1,10 +1,7 @@
 package com.blagovestpetkov.roomdatabasesample
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface WordDao {
@@ -17,4 +14,10 @@ interface WordDao {
 
     @Query("DELETE FROM word_table")
     fun deleteAll()
+
+    @Delete
+    fun deleteWord(word: Word)
+
+    @Query("SELECT * from word_table LIMIT 1")
+    fun getAnyWord(): Array<Word>
 }

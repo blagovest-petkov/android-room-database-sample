@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Database(entities = [Word::class], version = 1)
@@ -17,12 +18,12 @@ abstract class WordRoomDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: WordRoomDatabase? = null
-        private const val DB_NAME = "word_database"
 
-        fun getDatabase(
-            context: Context,
-            scope: CoroutineScope
-        ): WordRoomDatabase {
+        private const val DB_NAME = "word_database"
+        private val words = listOf("Hello", "World!")
+
+        fun getDatabase(context: Context, scope: CoroutineScope): WordRoomDatabase {
+
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
@@ -32,6 +33,7 @@ abstract class WordRoomDatabase : RoomDatabase() {
                     .fallbackToDestructiveMigration()
                     .addCallback(WordDatabaseCallback(scope))
                     .build()
+
                 INSTANCE = instance
 
                 return instance
@@ -43,11 +45,19 @@ abstract class WordRoomDatabase : RoomDatabase() {
                 super.onOpen(db)
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
-                        val wordDao: WordDao = database.wordDao()
-                        wordDao.deleteAll()
-                        wordDao.insert(Word("Hello"))
-                        wordDao.insert(Word("World!"))
+                        scope.launch(Dispatchers.IO) {
+                            populateDatabase(database.wordDao())
+                        }
                     }
+                }
+            }
+        }
+
+        private fun populateDatabase(wordDao: WordDao) {
+            // If we have no words, then create the initial list of words
+            if (wordDao.getAnyWord().isEmpty()) {
+                for (word in words) {
+                    wordDao.insert(Word(word))
                 }
             }
         }
